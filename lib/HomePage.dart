@@ -1,6 +1,6 @@
 import 'package:chineseh/HomeArticleItem.dart';
 import 'package:chineseh/model/Article.dart';
-import 'package:chineseh/model/HomeBannerBean.dart';
+import 'package:chineseh/model/HomeIndex.dart';
 import 'package:chineseh/net/ApiManager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -15,35 +15,50 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   // 首页banner列表
-  List<DataListBean> banners = List();
-  List<Article> articles = List();
+  List<BannerListBean> banners = List();
+  List<ListHotArticleListBean> articles = List();
+  List<ListOfficeListBean> offices = List();
+  int curPage = 0;
 
+  //ScrollController _scrollController=new ScrollController();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getBaner();
-    getList(false);
+    getIndex();
+    /* _scrollController.addListener((){
+      var maxScrollExtent = _scrollController.position.maxScrollExtent;
+      var pixels = _scrollController.position.pixels;
+      if(maxScrollExtent==pixels){
+        curPage++;
+        getList(true);
+      }
+    });*/
+
   }
 
   /// 创建banner条目
   Widget createBannerItem() {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width,
       height: 180,
       child: banners.length != 0
           ? Swiper(
         autoplayDelay: 3500,
-        itemWidth: MediaQuery.of(context).size.width,
+        itemWidth: MediaQuery
+            .of(context)
+            .size
+            .width,
         itemHeight: 180,
         itemBuilder: (BuildContext context, int index) {
           return new Image.network(
-            banners[index].imagePath,
+            banners[index].img,
             fit: BoxFit.fill,
           );
         },
         itemCount: banners.length,
-        viewportFraction: 0.8,
         scale: 0.9,
       )
           : SizedBox(
@@ -53,52 +68,105 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-
-//  请求首页文章页码
-  int curPage = 0;
+  Widget createOfficeItem(){
+    return Container(
+      child:Flex(
+        direction: Axis.horizontal,
+        children: <Widget>[
+          Expanded(child: Column(
+            children: <Widget>[
+              Image.network(offices[0].officeImg,width: 26,height: 26,),
+              Text(offices[0].name,textAlign: TextAlign.center,)
+            ],
+          ),flex: 1,),
+          Expanded(child: Column(
+            children: <Widget>[
+              Image.network(offices[1].officeImg,width: 26,height: 26,),
+              Text(offices[0].name,textAlign: TextAlign.center,)
+            ],
+          ),flex: 1,),
+          Expanded(child: Column(
+            children: <Widget>[
+              Image.network(offices[2].officeImg,width: 26,height: 26,),
+              Text(offices[0].name,textAlign: TextAlign.center,)
+            ],
+          ),flex: 1,),
+          Expanded(child: Column(
+            children: <Widget>[
+              Image.network(offices[3].officeImg,width: 26,height: 26,),
+              Text(offices[0].name,textAlign: TextAlign.center,)
+            ],
+          ),flex: 1,),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-
     Widget listView = ListView.builder(
       itemCount: articles.length + 1,
       itemBuilder: (context, index) {
         return index == 0
-            ? createBannerItem()
+            ? createOfficeItem()
             : HomeArticleItem(articles[index - 1]);
       },
+
     );
 
     return new Scaffold(
       body: Container(
-        child: listView,
+          child: listView
       ),
 
     );
   }
+/*  new Image.network(
+  widget.article.articleCover,
+  fit: BoxFit.contain,
+  ),
+  width: 226/2,
+  height: 134/2,
+  ),*/
 
-  void getBaner() async {
-    Response response = await ApiManager().getHomeBanner();
-    var homeBannerBean = HomeBannerBean.fromJson(response.data);
+
+  /*Future<Null> _pullToRefresh() async{
+    curPage=0;
+    await getList(false);
+    return null;
+  }*/
+
+  void getIndex() async {
+    Response response = await ApiManager().getHomeIndex();
+    var homeBannerBean = HomeIndex.fromJson(response.data);
     setState(() {
-      banners.clear();
-      banners.addAll(homeBannerBean.data);
+      if (homeBannerBean!=null){
+        print("homeBannerBean:"+homeBannerBean.code.toString());
+        banners.clear();
+        banners.addAll(homeBannerBean.data.banner);
+        articles.clear();
+        articles.addAll(homeBannerBean.data.listHotArticle);
+        offices.clear();
+        offices.addAll(homeBannerBean.data.listOffice);
+      }else{
+        print(homeBannerBean.toString());
+      }
+
+
     });
   }
 
-  /// 获取首页推荐文章数据
-  Future<Null> getList(bool loadMore) async {
+/// 获取首页推荐文章数据
+/* Future<Null> getList(bool loadMore) async {
     Response response = await ApiManager().getHomeArticle(curPage);
     var homeArticleBean = HomeArticleBean.fromJson(response.data);
     setState(() {
       if(loadMore){
-        articles.addAll(homeArticleBean.data.datas);
+        //articles.addAll(homeArticleBean.data.datas);
       } else {
-        articles.clear();
-        articles.addAll(homeArticleBean.data.datas);
+
       }
 
     });
-  }
+  }*/
 }

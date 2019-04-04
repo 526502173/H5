@@ -1,8 +1,8 @@
-import 'package:chineseh/model/Article.dart';
+import 'package:chineseh/model/HomeIndex.dart';
 import 'package:flutter/material.dart';
 
 class HomeArticleItem extends StatefulWidget {
-  Article article;
+  ListHotArticleListBean article;
 
   HomeArticleItem(this.article);
 
@@ -23,54 +23,36 @@ class _HomeArticleState extends State<HomeArticleItem> {
         child: Container(
           child: Column(
             children: <Widget>[
-             Row(
-               children: <Widget>[
-                 Icon(
-                   Icons.child_care,
-                   color: Colors.blueAccent,
-                   size: 18,
-                 ),
-                 Text(
-                   widget.article.author,
-                   maxLines: 1,
-                   overflow: TextOverflow.ellipsis,
-                   style: TextStyle(color: Colors.blueAccent),
-                 )
-               ],
+              Row(
+                children: <Widget>[
+                  Container(
+                    child: new Image.network(
+                      widget.article.articleCover,
+                      fit: BoxFit.contain,
+                    ),
+                    width: 226/2,
+                    height: 134/2,
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Text(
+                        widget.article.articleTitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                      ),
+                      Text(
+                        widget.article.articleDescription,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey,fontSize: 14),
+                      )
 
-             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                widget.article.title.replaceAll("&rdquo;", "").replaceAll("&ldquo;", ""),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16),
-              ),
+                    ],
+                  )
 
-            ),
-             Row(
-               children: <Widget>[
-                 Icon(
-                   Icons.access_time,
-                   color: Colors.grey,
-                   size: 15,
-                 ),
-                 Expanded(
-                     flex: 1,
-                     child: Padding(
-                       padding: EdgeInsets.only(left: 8),
-                       child: Text(
-                         widget.article.niceDate,
-                         maxLines: 1,
-                         overflow: TextOverflow.ellipsis,
-                         style: TextStyle(color: Colors.grey),
-                       ),
-                     ))
-               ],
-             )
+                ],
+              )
             ],
           ),
         ),
