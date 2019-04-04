@@ -18,6 +18,7 @@ class HomePageState extends State<HomePage> {
   List<BannerListBean> banners = List();
   List<ListHotArticleListBean> articles = List();
   List<ListOfficeListBean> offices = List();
+  HospitalBean hos = new HospitalBean(img: "",url: "");
   int curPage = 0;
 
   //ScrollController _scrollController=new ScrollController();
@@ -33,70 +34,118 @@ class HomePageState extends State<HomePage> {
         getList(true);
       }
     });*/
-
   }
 
   /// 创建banner条目
   Widget createBannerItem() {
     return Container(
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       height: 180,
       child: banners.length != 0
           ? Swiper(
-        autoplayDelay: 3500,
-        itemWidth: MediaQuery
-            .of(context)
-            .size
-            .width,
-        itemHeight: 180,
-        itemBuilder: (BuildContext context, int index) {
-          return new Image.network(
-            banners[index].img,
-            fit: BoxFit.fill,
-          );
-        },
-        itemCount: banners.length,
-        scale: 0.9,
-      )
+              autoplayDelay: 3500,
+              itemWidth: MediaQuery.of(context).size.width,
+              itemHeight: 180,
+              itemBuilder: (BuildContext context, int index) {
+                return new Image.network(
+                  banners[index].img,
+                  fit: BoxFit.fill,
+                );
+              },
+              itemCount: banners.length,
+              scale: 0.9,
+            )
           : SizedBox(
-        width: 0,
-        height: 0,
+              width: 0,
+              height: 0,
+            ),
+    );
+  }
+
+  Widget createHos() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Text("泰斗中医院",style: TextStyle(fontSize: 18,color:const Color(0xF010101) ),),
+          Image.network(
+            hos.img,
+            height: 150,
+            fit: BoxFit.contain,
+          )
+        ],
       ),
     );
   }
 
-  Widget createOfficeItem(){
+  Widget createOfficeItem() {
     return Container(
-      child:Flex(
+      child: Flex(
         direction: Axis.horizontal,
         children: <Widget>[
-          Expanded(child: Column(
-            children: <Widget>[
-              Image.network(offices[0].officeImg,width: 26,height: 26,),
-              Text(offices[0].name,textAlign: TextAlign.center,)
-            ],
-          ),flex: 1,),
-          Expanded(child: Column(
-            children: <Widget>[
-              Image.network(offices[1].officeImg,width: 26,height: 26,),
-              Text(offices[0].name,textAlign: TextAlign.center,)
-            ],
-          ),flex: 1,),
-          Expanded(child: Column(
-            children: <Widget>[
-              Image.network(offices[2].officeImg,width: 26,height: 26,),
-              Text(offices[0].name,textAlign: TextAlign.center,)
-            ],
-          ),flex: 1,),
-          Expanded(child: Column(
-            children: <Widget>[
-              Image.network(offices[3].officeImg,width: 26,height: 26,),
-              Text(offices[0].name,textAlign: TextAlign.center,)
-            ],
-          ),flex: 1,),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Image.network(
+                  offices[0].officeImg,
+                  width: 26,
+                  height: 26,
+                ),
+                Text(
+                  offices[0].name,
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+            flex: 1,
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Image.network(
+                  offices[1].officeImg,
+                  width: 26,
+                  height: 26,
+                ),
+                Text(
+                  offices[0].name,
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+            flex: 1,
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Image.network(
+                  offices[2].officeImg,
+                  width: 26,
+                  height: 26,
+                ),
+                Text(
+                  offices[0].name,
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+            flex: 1,
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Image.network(
+                  offices[3].officeImg,
+                  width: 26,
+                  height: 26,
+                ),
+                Text(
+                  offices[0].name,
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+            flex: 1,
+          ),
         ],
       ),
     );
@@ -107,20 +156,23 @@ class HomePageState extends State<HomePage> {
     Widget listView = ListView.builder(
       itemCount: articles.length + 1,
       itemBuilder: (context, index) {
-        return index == 0
-            ? createOfficeItem()
-            : HomeArticleItem(articles[index - 1]);
+        switch (index) {
+          case 0:
+            return createBannerItem();
+          case 1:
+            return createOfficeItem();
+          case 2:
+            return createHos();
+        }
+        return HomeArticleItem(articles[index - 2]);
       },
-
     );
 
     return new Scaffold(
-      body: Container(
-          child: listView
-      ),
-
+      body: Container(child: listView),
     );
   }
+
 /*  new Image.network(
   widget.article.articleCover,
   fit: BoxFit.contain,
@@ -128,7 +180,6 @@ class HomePageState extends State<HomePage> {
   width: 226/2,
   height: 134/2,
   ),*/
-
 
   /*Future<Null> _pullToRefresh() async{
     curPage=0;
@@ -140,23 +191,22 @@ class HomePageState extends State<HomePage> {
     Response response = await ApiManager().getHomeIndex();
     var homeBannerBean = HomeIndex.fromJson(response.data);
     setState(() {
-      if (homeBannerBean!=null){
-        print("homeBannerBean:"+homeBannerBean.code.toString());
+      if (homeBannerBean != null) {
+        print("homeBannerBean:" + homeBannerBean.code.toString());
         banners.clear();
         banners.addAll(homeBannerBean.data.banner);
         articles.clear();
         articles.addAll(homeBannerBean.data.listHotArticle);
         offices.clear();
         offices.addAll(homeBannerBean.data.listOffice);
-      }else{
+        hos = homeBannerBean.data.hospital;
+      } else {
         print(homeBannerBean.toString());
       }
-
-
     });
   }
 
-/// 获取首页推荐文章数据
+  /// 获取首页推荐文章数据
 /* Future<Null> getList(bool loadMore) async {
     Response response = await ApiManager().getHomeArticle(curPage);
     var homeArticleBean = HomeArticleBean.fromJson(response.data);
